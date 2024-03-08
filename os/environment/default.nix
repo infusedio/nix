@@ -18,7 +18,7 @@ in
     };
   };
 
-  config = lib.mkIf config.enable {
+  config = {
     nix.settings = {
       experimental-features = [ "nix-command" "flakes" ];
     };
