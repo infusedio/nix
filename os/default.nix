@@ -12,16 +12,16 @@ in
     # ./interface
   ];
 
-  options.os = {
-    # monitor = lib.mkOption {
-    #   type = lib.types.enum [
-    #     "bottom"
-    #     "btop"
-    #   ];
-    #   example = "btop";
-    #   description = "The monitoring tool to use";
-    # };
-  };
+  # options.os = {
+  # monitor = lib.mkOption {
+  #   type = lib.types.enum [
+  #     "bottom"
+  #     "btop"
+  #   ];
+  #   example = "btop";
+  #   description = "The monitoring tool to use";
+  # };
+  # };
 
   # config = lib.mkIf cfg.enable
   #   {
