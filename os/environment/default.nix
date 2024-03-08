@@ -52,7 +52,7 @@ in
     # };
 
     environment = {
-      systemPackages = with pkgs; [ ] // config.packages;
+      systemPackages = with pkgs; [ ] ++ config.packages;
 
       variables = {
         EDITOR = "nvim";
