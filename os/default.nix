@@ -12,22 +12,12 @@ in
     # ./interface
   ];
 
-  # options.os = {
-  # monitor = lib.mkOption {
-  #   type = lib.types.enum [
-  #     "bottom"
-  #     "btop"
-  #   ];
-  #   example = "btop";
-  #   description = "The monitoring tool to use";
-  # };
-  # };
+  options.os = {
+    state = "23.11";
+  };
 
-  # config = lib.mkIf cfg.enable
-  #   {
-  #
-  #     os.metrics.programs.bottom.enable = cfg.monitor == "bottom";
-  #     os.metrics.programs.btop.enable = cfg.monitor == "btop";
-  #   };
+  config = {
+    system.stateVersion = config.state;
+  };
 }
 
