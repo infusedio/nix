@@ -19,7 +19,14 @@ in
 
     packages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
+      description = "List of packages to be installed on the system level";
       default = [ ];
+    };
+
+    libraries = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+      description = "List of libraries to be dynamically linked through `nix-ld`";
     };
 
     shell = {
@@ -61,6 +68,12 @@ in
         EDITOR = "nvim";
         VISUAL = "nvim";
       } // config.shell.variables;
+    };
+
+    programs.nix-ld = {
+      enable = true;
+
+      libraries = with pkgs; [ ] ++ config.libraries;
     };
   };
 }
