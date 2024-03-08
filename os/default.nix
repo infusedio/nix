@@ -12,16 +12,17 @@ in
     # ./interface
   ];
 
-  options.os = {
-    state = "23.11";
-  };
+  options.os = { };
 
   config = {
-    system.stateVersion = config.state;
+    system.stateVersion = "23.11";
 
     nix = {
       settings = {
-        experimental-features = [ "nix-command" "flakes" ];
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
       };
     };
 
