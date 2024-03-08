@@ -5,6 +5,10 @@ let
 
 in
 {
+  imports = [
+    ./virtual
+  ];
+
   options.os.hardware = { };
 
   config = { };
