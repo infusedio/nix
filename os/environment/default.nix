@@ -1,4 +1,4 @@
-input@{ lib, pkgs, ... }:
+input@{ lib, pkgs, person, ... }:
 
 let
   config = input.config.os.environment;
@@ -29,6 +29,16 @@ in
       description = "List of libraries to be dynamically linked through `nix-ld`";
     };
 
+    user = {
+      name = lib.mkOption {
+        type = lib.types.str;
+      };
+      groups = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+      };
+    };
+
     shell = {
       variables = lib.mkOption {
         type = lib.types.attrsOf lib.types.str;
@@ -38,8 +48,13 @@ in
   };
 
   config = {
-    nix.settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+    nix = {
+      settings = {
+        experimental-features = [ "nix-command" "flakes" ];
+        extra-trusted-users = [
+          config.user.name or person.name
+        ];
+      };
     };
 
     time = {
@@ -74,6 +89,25 @@ in
       enable = true;
 
       libraries = with pkgs; [ ] ++ config.libraries;
+    };
+
+    programs = {
+      zsh = {
+        enable = true;
+      };
+
+      dconf = {
+        enable = true;
+      };
+    };
+
+    users.users.${config.user.name or person.name} = {
+      isNormalUser = true;
+      extraGroups = [
+        "wheel"
+      ] ++ config.user.groups;
+
+      defaultUserShell = pkgs.zsh;
     };
   };
 }
