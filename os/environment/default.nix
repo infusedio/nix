@@ -7,14 +7,26 @@ in
 {
   options.os.environment = {
     i18n = {
-      timezone = lib.mkDefault "Pacific/Auckland";
-      locale = lib.mkDefault "en_NZ.UTF-8";
+      timezone = lib.mkOption {
+        type = lib.types.str;
+        default = "Pacific/Auckland";
+      };
+      locale = lib.mkOption {
+        type = lib.types.str;
+        default = lib.mkDefault "en_NZ.UTF-8";
+      };
     };
 
-    packages = lib.mkDefault [ ];
+    packages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+    };
 
     shell = {
-      variables = lib.mkDefault { };
+      variables = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
+        default = { };
+      };
     };
   };
 
@@ -40,18 +52,12 @@ in
     # };
 
     environment = {
-      systemPackages = with pkgs; [
-        bottom
-      ] // config.packages;
+      systemPackages = with pkgs; [ ] // config.packages;
 
       variables = {
         EDITOR = "nvim";
         VISUAL = "nvim";
       } // config.shell.variables;
-
-      zsh = {
-        enable = true;
-      };
     };
   };
 }
