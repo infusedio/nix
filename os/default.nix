@@ -1,4 +1,4 @@
-input@{ lib, ... }:
+input@{ nixpkgs, lib, ... }:
 
 let
   config = input.config.os;
@@ -8,7 +8,7 @@ in
   imports = [
     # ./cache
     ./environment
-    # ./hardware
+    ./hardware
     # ./interface
   ];
 
@@ -18,6 +18,17 @@ in
 
   config = {
     system.stateVersion = config.state;
+
+    nix = {
+      settings = {
+        experimental-features = [ "nix-command" "flakes" ];
+      };
+    };
+
+    nixpkgs = {
+      config = {
+        allowUnfree = true;
+      };
+    };
   };
 }
-
