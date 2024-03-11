@@ -14,6 +14,7 @@ in
     ./kernel
     ./network
     ./storage
+    ./video
     ./virtual
   ];
 
@@ -27,7 +28,7 @@ in
   config = {
     nixpkgs.hostPlatform = lib.mkDefault config.platform;
 
-    # TODO: we can split the cpu platforms into amd/intel
+    # NOTE: we can split the cpu platforms into amd/intel
     # to mimic how we structure the hardware.video modules
     # for now we are on amd cpus
     hardware.cpu.amd.updateMicrocode = lib.mkDefault true;

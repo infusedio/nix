@@ -20,8 +20,8 @@ in
       };
     };
 
-    users.users.${dev.name} = {
-      extraGroups = [ "docker" ];
-    };
+    users.users.${dev.name}.extraGroups = [
+      "docker"
+    ];
   };
 }

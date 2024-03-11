@@ -19,10 +19,9 @@ in
     };
 
     hosts = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       description = "Hostnames to resolve";
-      default = ''
-      '';
+      default = '''';
     };
 
     dns = lib.mkOption {

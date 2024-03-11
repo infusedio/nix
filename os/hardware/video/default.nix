@@ -1,32 +1,38 @@
-input@{ lib, config, ... }:
+input@{ lib, ... }:
 
 let
-  cfg = config.os.metrics;
+  config = config.os.hardware.video;
 
 in
 {
   imports = [
-    ./bottom.nix
-    ./btop.nix
+    ./amd.nix
+    ./nvidia.nix
   ];
 
-  options.os.metrics = {
-    enable = lib.mkEnableOption "metrics";
-
-    monitor = lib.mkOption {
+  options.os.hardware.video = {
+    platform = lib.mkOption {
       type = lib.types.enum [
-        "bottom"
-        "btop"
+        "amd"
+        "nvidia"
       ];
-      example = "btop";
-      description = "The monitoring tool to use";
+      description = "The GPU vendor the primary GPU is manufactured by";
     };
   };
 
-  config = lib.mkIf cfg.enable
+  config = lib.mkIf config.enable
     {
-      os.metrics.programs.bottom.enable = cfg.monitor == "bottom";
-      os.metrics.programs.btop.enable = cfg.monitor == "btop";
+      hardware.opengl.enable = true;
+
+      os.hardware.video.platform.amd.enable = config.platform == "amd";
+      os.hardware.video.platform.nvidia.enable = config.platform == "nvidia";
+
+      environment = {
+        sessionVariables = {
+          NIXOS_OZONE_WL = "1";
+          WLR_NO_HARDWARE_CURSORS = "1";
+        };
+      };
     };
 }
 
