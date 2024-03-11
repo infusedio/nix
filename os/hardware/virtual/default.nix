@@ -1,4 +1,4 @@
-input@{ lib, settings, ... }:
+input@{ lib, dev, ... }:
 
 let
   config = input.config.os.hardware.virtual;
@@ -16,12 +16,11 @@ in
   config = {
     virtualisation = {
       docker = {
-        enable = config.enable;
+        enable = lib.mkDefault config.enable;
       };
     };
 
-    # add user to docker group
-    users.users.${settings.dev.user.name} = {
+    users.users.${dev.name} = {
       extraGroups = [ "docker" ];
     };
   };

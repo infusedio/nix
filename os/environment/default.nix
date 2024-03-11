@@ -1,4 +1,4 @@
-input@{ lib, pkgs, person, ... }:
+input@{ lib, pkgs, dev, ... }:
 
 let
   config = input.config.os.environment;
@@ -32,6 +32,7 @@ in
     user = {
       name = lib.mkOption {
         type = lib.types.str;
+        default = dev.name;
       };
       groups = lib.mkOption {
         type = lib.types.listOf lib.types.str;
@@ -52,7 +53,7 @@ in
       settings = {
         experimental-features = [ "nix-command" "flakes" ];
         extra-trusted-users = [
-          config.user.name or person.name
+          config.user.name or dev.name
         ];
       };
     };
@@ -101,13 +102,15 @@ in
       };
     };
 
-    users.users.${config.user.name or person.name} = {
-      isNormalUser = true;
-      extraGroups = [
-        "wheel"
-      ] ++ config.user.groups;
-
+    users = {
       defaultUserShell = pkgs.zsh;
+
+      users.${config.user.name} = {
+        isNormalUser = true;
+        extraGroups = [
+          "wheel"
+        ] ++ config.user.groups;
+      };
     };
   };
 }

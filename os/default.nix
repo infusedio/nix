@@ -7,6 +7,7 @@ in
 {
   imports = [
     # ./cache
+    # ./dev
     ./environment
     ./hardware
     # ./interface
@@ -15,7 +16,7 @@ in
   options.os = { };
 
   config = {
-    system.stateVersion = "23.11";
+    system.stateVersion = lib.mkDefault "23.11";
 
     nix = {
       settings = {
@@ -28,7 +29,7 @@ in
 
     nixpkgs = {
       config = {
-        allowUnfree = true;
+        allowUnfree = lib.mkDefault true;
       };
     };
   };
