@@ -18,12 +18,13 @@ in
           inherit self inputs dev machine settings;
         };
 
-        # users.${dev.name} = import ./dev;
+        users.${dev.name} = import ./dev.nix;
       };
     })
-    # ./dev
   ];
 
+  # TODO: options are not set properly, we are using `dev` global set directly, this is not type safe
+  # parametarize everything properly while refactoring #os._dev to its own output
   options.os._dev = { };
 
   config = { };

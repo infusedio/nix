@@ -1,4 +1,4 @@
-input@{ nixpkgs, lib, ... }:
+input@{ lib, settings, ... }:
 
 let
   config = input.config.os;
@@ -6,6 +6,7 @@ let
 in
 {
   imports = [
+    ./_dev
     ./cache
     ./environment
     ./hardware
@@ -15,7 +16,7 @@ in
   options.os = { };
 
   config = {
-    system.stateVersion = lib.mkDefault "23.11";
+    system.stateVersion = settings.state;
 
     nix = {
       settings = {

@@ -1,14 +1,20 @@
-{ pkgs, dev, machine, settings, ... }:
+{ inputs, lib, pkgs, dev, machine, settings, ... }:
 
 let
+  import-assets = inputs.nix-filter.lib;
+
   ui = with pkgs; {
+    assets = import-assets {
+      root = ./config/assets;
+    };
+
     terminal = {
       name = "alacritty";
 
       font = {
         package = (nerdfonts.override { fonts = [ "JetBrainsMono" ]; });
         name = "JetBrainsMono Nerd Font";
-        size = 10;
+        size = dev.ui.font.size or 10;
       };
 
       theme = {
@@ -25,7 +31,7 @@ let
       font = {
         package = roboto;
         name = "Roboto";
-        size = 10;
+        size = dev.ui.font.size or 10;
       };
 
       cursor = {
@@ -56,13 +62,11 @@ in
   };
 
   home = {
-    # TODO: note how it is done in #os and replicate in #dev
     stateVersion = settings.state;
 
     username = dev.name;
     homeDirectory = "/home/${dev.name}";
 
-    # NOTE: customize
     packages = with pkgs; [
       ntfs3g
 
@@ -125,19 +129,19 @@ in
 
     # TODO: ingest all as a nix fileset and iterate into the "preload" hyprpaper command
     # TODO: the entire file handling situation here is not good, it should all be references to nix ingested files
-    # file.".config/hypr/hyprpaper.conf" =
-    # let
-    #   # NOTE: customize by just passing a path to an ingested asset
-    #   wallpaper = "${nyx.paths.wallpapers}/wallhaven-y8er97.png";
-    # in
-    # {
-    #   text = ''
-    #     splash = false
-    #
-    #     preload = ${wallpaper}
-    #     wallpaper = ${nyx.hardware.monitors.main},${wallpaper}
-    #   '';
-    # };
+    file.".config/hypr/hyprpaper.conf" =
+      let
+        # NOTE: customize by just passing a path to an ingested asset
+        wallpaper = "${ui.assets}/wallpapers/wallhaven-y8er97.png";
+      in
+      {
+        text = ''
+          splash = false
+
+          preload = ${wallpaper}
+          wallpaper = ${(lib.head machine.devices.displays).output},${wallpaper}
+        '';
+      };
   };
 
   services.swayosd = {
