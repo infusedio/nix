@@ -78,7 +78,12 @@ in
     };
 
     environment = {
-      systemPackages = with pkgs; [ ] ++ config.packages;
+      systemPackages = with pkgs; [
+        git
+        curl
+        wget
+        neovim
+      ] ++ config.packages;
 
       variables = {
         EDITOR = "nvim";
