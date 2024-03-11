@@ -6,8 +6,8 @@ let
 in
 {
   imports = [
-    ./amd.nix
-    ./nvidia.nix
+    ./vendor/amd.nix
+    ./vendor/nvidia.nix
   ];
 
   options.os.hardware.video = {
@@ -20,19 +20,18 @@ in
     };
   };
 
-  config = lib.mkIf config.enable
-    {
-      hardware.opengl.enable = true;
+  config = {
+    hardware.opengl.enable = true;
 
-      os.hardware.video.platform.amd.enable = config.platform == "amd";
-      os.hardware.video.platform.nvidia.enable = config.platform == "nvidia";
+    os.hardware.video.platform.amd.enable = config.platform == "amd";
+    os.hardware.video.platform.nvidia.enable = config.platform == "nvidia";
 
-      environment = {
-        sessionVariables = {
-          NIXOS_OZONE_WL = "1";
-          WLR_NO_HARDWARE_CURSORS = "1";
-        };
+    environment = {
+      sessionVariables = {
+        NIXOS_OZONE_WL = "1";
+        WLR_NO_HARDWARE_CURSORS = "1";
       };
     };
+  };
 }
 

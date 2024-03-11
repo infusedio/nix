@@ -1,11 +1,11 @@
 input@{ lib, ... }:
 
 let
-  config = input.config.os.hardware.video.platform.nvidia;
+  config = input.config.os.hardware.video.vendor.nvidia;
 
 in
 {
-  options.os.hardware.video.platform.nvidia = {
+  options.os.hardware.video.vendor.nvidia = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;

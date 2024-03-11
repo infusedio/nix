@@ -1,11 +1,11 @@
 input@{ lib, pkgs, ... }:
 
 let
-  config = input.config.os.hardware.video.platform.amd;
+  config = input.config.os.hardware.video.vendor.amd;
 
 in
 {
-  options.os.hardware.video.platform.amd = {
+  options.os.hardware.video.vendor.amd = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
