@@ -12,6 +12,7 @@ in
     ./bluetooth
     ./boot
     ./kernel
+    ./storage
     ./virtual
   ];
 
