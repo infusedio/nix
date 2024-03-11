@@ -114,6 +114,7 @@ in
 
       users.${config.user.name} = {
         isNormalUser = true;
+
         extraGroups = [
           "wheel"
         ] ++ config.user.groups;
