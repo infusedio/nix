@@ -7,10 +7,9 @@ in
 {
   imports = [
     # ./cache
-    # ./dev
     ./environment
     ./hardware
-    # ./interface
+    ./interface
   ];
 
   options.os = { };
