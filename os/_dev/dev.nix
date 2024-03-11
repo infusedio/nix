@@ -355,6 +355,18 @@ in
 
       serverAliveInterval = 240;
       serverAliveCountMax = 2;
+
+      matchBlocks =
+        let
+          github = "github.com";
+        in
+        {
+          ${github} = {
+            hostname = github;
+            user = dev.name;
+            identityFile = "~/.ssh/${dev.name}.pem";
+          };
+        };
     };
 
     git = {
