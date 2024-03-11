@@ -52,8 +52,10 @@ in
     nix = {
       settings = {
         experimental-features = [ "nix-command" "flakes" ];
-        extra-trusted-users = [
-          config.user.name or dev.name
+
+        trusted-users = [
+          "root"
+          "@wheel"
         ];
       };
     };
