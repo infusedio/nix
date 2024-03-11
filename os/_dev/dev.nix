@@ -169,54 +169,73 @@ in
       };
 
       # NOTE: customize
-      shellAliases = {
-        # zoxide
-        cd = "z";
+      shellAliases =
+        let
+          paths = {
+            flake = "$HOME/dev/${dev.handle}-nix";
+          };
 
-        # bun
-        b = "bun";
-        bx = "bunx";
-        bi = "bun install";
-        bid = "bun install -D";
+          commands = {
+            input = {
+              update = (input: flake_path: "nix flake lock --update-input ${input} ${flake_path}");
+            };
+            flake = {
+              build = (flake_path: "sudo nixos-rebuild build --flake ${flake_path} --show-trace");
+              switch = (flake_path: "sudo nixos-rebuild switch --flake ${flake_path} --show-trace");
+            };
+          };
+        in
+        {
+          # nix
+          switch = "${commands.input.update "infused-nix" paths.flake} && ${commands.flake.switch paths.flake}";
 
-        # nx
-        n = "bunx nx";
+          # zoxide
+          cd = "z";
 
-        # docker
-        d = "docker";
+          # bun
+          b = "bun";
+          bx = "bunx";
+          bi = "bun install";
+          bid = "bun install -D";
 
-        # containers
-        dgc = "docker ps";
-        dgca = "docker ps -a";
+          # nx
+          n = "bunx nx";
 
-        # kubernetes
-        k = "kubectl";
+          # docker
+          d = "docker";
 
-        # all
-        kga = "kubectl get all";
-        kgaa = "kubectl get all --all-namespaces";
+          # containers
+          dgc = "docker ps";
+          dgca = "docker ps -a";
 
-        # node
-        kgn = "kubectl get nodes";
+          # kubernetes
+          k = "kubectl";
 
-        # pod
-        kgp = "kubectl get pods";
-        kgpa = "kubectl get pods --all-namespaces";
-        kdp = "kubectl describe pod";
-        kdpa = "kubectl describe pod --all-namespaces";
+          # all
+          kga = "kubectl get all";
+          kgaa = "kubectl get all --all-namespaces";
 
-        # deployment
-        kgd = "kubectl get deployments";
-        kgda = "kubectl get deployments --all-namespaces";
-        kdd = "kubectl describe deployment";
-        kdda = "kubectl describe deployment --all-namespaces";
+          # node
+          kgn = "kubectl get nodes";
 
-        # service
-        kgs = "kubectl get services";
-        kgsa = "kubectl get services --all-namespaces";
-        kds = "kubectl describe service";
-        kdsa = "kubectl describe service --all-namespaces";
-      };
+          # pod
+          kgp = "kubectl get pods";
+          kgpa = "kubectl get pods --all-namespaces";
+          kdp = "kubectl describe pod";
+          kdpa = "kubectl describe pod --all-namespaces";
+
+          # deployment
+          kgd = "kubectl get deployments";
+          kgda = "kubectl get deployments --all-namespaces";
+          kdd = "kubectl describe deployment";
+          kdda = "kubectl describe deployment --all-namespaces";
+
+          # service
+          kgs = "kubectl get services";
+          kgsa = "kubectl get services --all-namespaces";
+          kds = "kubectl describe service";
+          kdsa = "kubectl describe service --all-namespaces";
+        };
     };
 
     starship = {
