@@ -20,18 +20,17 @@ in
     };
   };
 
-  config = {
-    hardware.opengl.enable = true;
+  config = lib.mkMerge [
+    {
+      hardware.opengl.enable = true;
 
-    os.hardware.video.vendor.amd.enable = config.platform == "amd";
-    os.hardware.video.vendor.nvidia.enable = config.platform == "nvidia";
-
-    environment = {
-      sessionVariables = {
-        NIXOS_OZONE_WL = "1";
-        WLR_NO_HARDWARE_CURSORS = "1";
+      environment = {
+        sessionVariables = {
+          NIXOS_OZONE_WL = "1";
+          WLR_NO_HARDWARE_CURSORS = "1";
+        };
       };
-    };
-  };
+    }
+  ];
 }
 

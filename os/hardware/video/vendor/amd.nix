@@ -1,19 +1,7 @@
 input@{ lib, pkgs, ... }:
 
-let
-  config = input.config.os.hardware.video.vendor.amd;
-
-in
 {
-  options.os.hardware.video.vendor.amd = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable AMD support";
-    };
-  };
-
-  config = lib.mkIf config.enable {
+  config = lib.mkIf (input.config.os.hardware.video.platform == "amd") {
     hardware.opengl = {
       extraPackages = with pkgs; [
         rocmPackages.clr.icd
