@@ -39,8 +39,8 @@ in
     networking.useDHCP = lib.mkDefault false;
 
     # TODO: iterate configurable, provided in options network adapters
-    networking.interfaces.enp5s0.useDHCP = lib.mkDefault true;
-    networking.interfaces.wlp4s0.useDHCP = lib.mkDefault true;
+    # networking.interfaces.enp5s0.useDHCP = lib.mkDefault true;
+    # networking.interfaces.wlp4s0.useDHCP = lib.mkDefault true;
 
     users.users.${dev.name}.extraGroups = [
       "networkmanager"
@@ -52,21 +52,23 @@ in
       networkmanager = {
         enable = true;
 
-        insertNameservers = {
-          "isp" = [ ];
-          "google" = [
-            "8.8.8.8"
-            "8.8.4.4"
-            "2001:4860:4860::8888"
-            "2001:4860:4860::8844"
-          ];
-          "cloudflare" = [
-            "1.1.1.1"
-            "1.0.0.1"
-            "2606:4700:4700::1111"
-            "2606:4700:4700::1001"
-          ];
-        }."${config.dns}";
+        insertNameservers = (
+          {
+            isp = [ ];
+            google = [
+              "8.8.8.8"
+              "8.8.4.4"
+              "2001:4860:4860::8888"
+              "2001:4860:4860::8844"
+            ];
+            cloudflare = [
+              "1.1.1.1"
+              "1.0.0.1"
+              "2606:4700:4700::1111"
+              "2606:4700:4700::1001"
+            ];
+          }.${config.dns}
+        );
       };
 
       firewall = {
