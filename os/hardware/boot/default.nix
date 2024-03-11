@@ -1,4 +1,4 @@
-input@{ lib, pkgs, dev, ... }:
+input@{ lib, pkgs, ... }:
 
 let
   config = input.config.os.hardware.boot;
@@ -37,6 +37,3 @@ in
     };
   };
 }
-
-
-

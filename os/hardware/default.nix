@@ -8,6 +8,7 @@ in
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
 
+    ./audio
     ./boot
     ./kernel
     ./virtual
