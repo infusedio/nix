@@ -7,7 +7,21 @@ in
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    ./dev
+    ({ self, inputs, home-manager, dev, machine, settings, ... }: {
+      nixpkgs.overlays = [ inputs.alacritty-theme.overlays.default ];
+
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = true;
+
+        extraSpecialArgs = {
+          inherit self inputs dev machine settings;
+        };
+
+        # users.${dev.name} = import ./dev;
+      };
+    })
+    # ./dev
   ];
 
   options.os._dev = { };
