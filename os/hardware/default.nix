@@ -9,6 +9,7 @@ in
     (modulesPath + "/installer/scan/not-detected.nix")
 
     ./audio
+    ./bluetooth
     ./boot
     ./kernel
     ./virtual
@@ -30,5 +31,3 @@ in
     hardware.cpu.amd.updateMicrocode = lib.mkDefault true;
   };
 }
-
-
