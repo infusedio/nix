@@ -7,6 +7,8 @@ in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
+
+    ./boot
     ./kernel
     ./virtual
   ];
