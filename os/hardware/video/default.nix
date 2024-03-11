@@ -6,8 +6,8 @@ let
 in
 {
   imports = [
-    ./vendors/amd.nix
-    ./vendors/nvidia.nix
+    ./vendor/amd.nix
+    ./vendor/nvidia.nix
   ];
 
   options.os.hardware.video = {
@@ -23,8 +23,8 @@ in
   config = {
     hardware.opengl.enable = true;
 
-    os.hardware.video.platform.amd.enable = config.platform == "amd";
-    os.hardware.video.platform.nvidia.enable = config.platform == "nvidia";
+    os.hardware.video.vendor.amd.enable = config.platform == "amd";
+    os.hardware.video.vendor.nvidia.enable = config.platform == "nvidia";
 
     environment = {
       sessionVariables = {
