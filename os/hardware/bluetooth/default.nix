@@ -1,4 +1,4 @@
-input@{ lib, dev, ... }:
+input@{ lib, pkgs, dev, ... }:
 
 let
   config = input.config.os.hardware.bluetooth;
@@ -21,7 +21,7 @@ in
     # iterate dev.devices.speakers
     # get list of devices that are marked as "autoconnect": true
     # iterate that list:
-    systemd.services.bluetooth-autoconnect = with dev.devices.headphones.bluetooth; {
+    systemd.services.bluetooth-autoconnect = with (lib.head dev.devices.headphones).bluetooth; {
       description = "Autoconnect to ${address} headphones";
       after = [ "blutooth.service" ];
       wantedBy = [ "multi-user.target" ];
