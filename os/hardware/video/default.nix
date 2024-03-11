@@ -6,8 +6,8 @@ let
 in
 {
   imports = [
-    ./vendor/amd.nix
-    ./vendor/nvidia.nix
+    ./vendors/amd.nix
+    ./vendors/nvidia.nix
   ];
 
   options.os.hardware.video = {
