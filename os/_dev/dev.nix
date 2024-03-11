@@ -301,6 +301,10 @@ in
       enable = true;
     };
 
+    btop = {
+      enable = true;
+    };
+
     alacritty = with ui.terminal; {
       enable = true;
 
