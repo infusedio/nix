@@ -6,7 +6,7 @@ let
 in
 {
   imports = [
-    # ./cache
+    ./cache
     ./environment
     ./hardware
     ./interface
