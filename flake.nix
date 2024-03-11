@@ -8,11 +8,11 @@
   outputs = inputs@{ self, nixpkgs, ... }:
     {
       nixosModules = {
-        # default = ./std;
-        # std = ./std;
+        default = ./std;
+
+        std = ./std;
         os = ./os;
-        # dev = ./dev;
-        # env = ./env;
+        dev = ./dev;
       };
 
       devShells = {

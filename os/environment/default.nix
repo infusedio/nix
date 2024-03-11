@@ -49,12 +49,6 @@ in
   };
 
   config = {
-    nix = {
-      settings = {
-        experimental-features = [ "nix-command" "flakes" ];
-      };
-    };
-
     time = {
       timeZone = config.i18n.timezone;
     };
