@@ -101,6 +101,7 @@ in
       discord
       webcord
 
+      mysql
       dbeaver
       qbittorrent
       calibre
