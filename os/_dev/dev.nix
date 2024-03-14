@@ -249,9 +249,43 @@ in
 
     starship = {
       enable = true;
-
       settings = {
         add_newline = false;
+
+        character =
+          let
+            modes = rec {
+              normal = {
+                symbol = "󰁔";
+                color = "#c3e88d";
+              };
+
+              insert = {
+                symbol = normal.symbol;
+                color = "#ff757f";
+              };
+
+              replace = {
+                symbol = insert.symbol;
+                color = "#c53b53";
+              };
+
+              visual = {
+                symbol = insert.symbol;
+                color = "#3d59a1";
+              };
+            };
+          in
+          {
+            vimcmd_symbol = with modes.normal; "[${symbol}](bold ${color})";
+            error_symbol = "[](bold #ffc777)";
+            success_symbol = with modes.insert; "[${symbol}](bold ${color})";
+
+            # BUG: these do not have any effect, potentially due to zsh-vi-mode plugin treating these modes differently?
+            vimcmd_replace_one_symbol = with modes.replace; "[${symbol}](bold ${color})";
+            vimcmd_replace_symbol = with modes.replace; "[${symbol}](bold ${color})";
+            vimcmd_visual_symbol = with modes.visual; "[${symbol}](bold ${color})";
+          };
 
         nix_shell = {
           format = "via [$symbol]($style)";
@@ -433,8 +467,12 @@ in
       ];
 
       extraConfig = ''
-        # render
+        # truecolor
         set-option -sa terminal-features ',${ui.terminal.name}:RGB'
+
+        # https://github.com/folke/tokyonight.nvim?tab=readme-ov-file#fix-undercurls-in-tmux
+        set -as terminal-overrides ',*:Smulx=\E[4::%p1%dm'
+        set -as terminal-overrides ',*:Setulc=\E[58::2::%p1%{65536}%/%d::%p1%{256}%/%{255}%&%d::%p1%{255}%&%d%;m'
 
         # mouse
         set -g mouse on
