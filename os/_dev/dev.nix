@@ -289,6 +289,7 @@ in
 
         nix_shell = {
           format = "via [$symbol]($style)";
+          symbol = "󱄅";
         };
       };
     };
@@ -605,7 +606,6 @@ in
           "${alacritty}/bin/alacritty --title \"PERSISTENT_WORKSPACE_3\" &"
 
           "${hyprpaper}/bin/hyprpaper &"
-          "${swayosd}/bin/swayosd-server &"
 
           "${alacritty}/bin/alacritty --title \"P_TERMINAL_1\" --option \"window.padding={x=20,y=20}\" &"
           "${alacritty}/bin/alacritty --title \"P_TERMINAL_2\" --option \"window.padding={x=20,y=20}\" &"
@@ -615,6 +615,8 @@ in
           "${webcord}/bin/webcord &"
           "${slack}/bin/slack &"
           "${spotify}/bin/spotify &"
+
+          "${swayosd}/bin/swayosd-server &"
         ];
 
         monitor = with lib.head machine.devices.displays;
