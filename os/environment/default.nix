@@ -73,6 +73,7 @@ in
         git
         curl
         wget
+        btop
         neovim
       ] ++ config.packages;
 
