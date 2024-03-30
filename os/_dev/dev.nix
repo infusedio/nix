@@ -1,6 +1,10 @@
-{ inputs, lib, pkgs, dev, machine, settings, ... }:
+{ config, inputs, lib, pkgs, dev, machine, settings, ... }:
 
 let
+  paths = {
+    home = config.home.homeDirectory;
+  };
+
   import-assets = inputs.nix-filter.lib;
 
   ui = with pkgs; {
@@ -145,12 +149,31 @@ in
       };
   };
 
-  services.swayosd = {
-    enable = true;
-  };
+  services = {
+    gpg-agent = {
+      enable = true;
 
-  services.playerctld = {
-    enable = true;
+      pinentryPackage = pkgs.pinentry-curses;
+
+      defaultCacheTtl = 86400; # 1 day
+      maxCacheTtl = 604800; # 1 week
+
+      enableZshIntegration = true;
+
+      # TODO:
+      # enableSshSupport = true;
+      # defaltCacheTtlSsh = 86400; # 1 day
+      # maxCacheTtlSsh = 604800; # 1 week
+      # sshKeys = [ ];
+    };
+
+    swayosd = {
+      enable = true;
+    };
+
+    playerctld = {
+      enable = true;
+    };
   };
 
   programs = {
@@ -409,6 +432,16 @@ in
         };
     };
 
+    gpg = {
+      enable = true;
+
+      homedir = "${paths.home}/.gpg";
+
+      # NOTE: make immutable when age or sops is introduced
+      mutableKeys = true;
+      mutableTrust = true;
+    };
+
     git = {
       enable = true;
 
@@ -531,10 +564,6 @@ in
 
     lazygit = {
       enable = true;
-
-      settings = {
-        quitOnTopLevelReturn = true;
-      };
     };
 
     k9s = {
