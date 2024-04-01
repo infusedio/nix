@@ -573,6 +573,10 @@ in
         confirmOnQuit = true;
         promptToReturnFromSubprocess = false;
 
+        git = {
+          overrideGpg = true;
+        };
+
         gui = {
           showPanelJump = false;
           showBottomLine = false;
