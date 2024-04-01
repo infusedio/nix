@@ -567,6 +567,37 @@ in
 
     lazygit = {
       enable = true;
+
+      settings = {
+        disableStartupPopups = true;
+        confirmOnQuit = true;
+        promptToReturnFromSubprocess = false;
+
+        gui = {
+          showPanelJump = false;
+          showBottomLine = false;
+          showRandomTip = false;
+          nerdFontsVersion = "3";
+
+          skipStashWarning = true;
+          skipDiscardChangeWarning = true;
+          skipRewordInEditorWarning = true;
+        };
+
+        refresher = {
+          refreshInterval = 1;
+        };
+
+        keybinding = {
+          universal = {
+            quit = "q";
+            quit-alt1 = "";
+            quitWithoutChangingDirectory = "";
+            undo = "u";
+            redo = "U";
+          };
+        };
+      };
     };
 
     k9s = {
