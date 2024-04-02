@@ -765,9 +765,9 @@ in
 
             "${prefix},return,exec,${alacritty}/bin/alacritty"
 
-            "${prefix},d,exec,${webcord}/bin/webcord"
-            "${prefix},m,exec,${spotify}/bin/spotify"
-            "${prefix},w,exec,${google-chrome}/bin/google-chrome-stable --restore-last-session --hide-crash-restore-bubble"
+            "${prefix},d,exec,${webcord}/bin/webcord --disable-features=WaylandFractionalScaleV1"
+            "${prefix},m,exec,${spotify}/bin/spotify --disable-features=WaylandFractionalScaleV1"
+            "${prefix},w,exec,${google-chrome}/bin/google-chrome-stable --restore-last-session --hide-crash-restore-bubble --disable-features=WaylandFractionalScaleV1"
             "${prefix},s,exec,${grimblast}/bin/grimblast copy area"
             "ALT_${prefix},s,exec,${grimblast}/bin/grimblast copy screen"
 
