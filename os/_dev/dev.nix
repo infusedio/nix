@@ -153,12 +153,11 @@ in
     gpg-agent = {
       enable = true;
 
+      enableZshIntegration = true;
       pinentryPackage = pkgs.pinentry-curses;
 
-      defaultCacheTtl = 86400; # 1 day
+      defaultCacheTtl = 604800; # 1 week
       maxCacheTtl = 604800; # 1 week
-
-      enableZshIntegration = true;
 
       # TODO:
       # enableSshSupport = true;
