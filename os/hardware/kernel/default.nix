@@ -29,7 +29,7 @@ in
         (with pkgs; (if config.channel == "latest" then linuxPackages_latest else linuxPackages));
 
       kernel = {
-        sysctl."fs.inotify.max_user_watches" = 524288;
+        sysctl."fs.inotify.max_user_watches" = 4194304; # 4gb
       };
     };
   };
