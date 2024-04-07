@@ -51,6 +51,20 @@ let
     };
   };
 
+  spf = pkgs.stdenv.mkDerivation {
+    name = "spf";
+    src = pkgs.fetchurl {
+      url = "https://github.com/MHNightCat/superfile/releases/download/v1.0.0/spf";
+      sha256 = "sha256-D0swlLGCrQCAihFuw+TFc8hqFBlHE1a7J2BrDy5uDPg=";
+    };
+    unpackPhase = "true";
+    installPhase = ''
+      mkdir -p $out/bin
+      cp $src $out/bin/spf
+      chmod +x $out/bin/spf
+    '';
+  };
+
 in
 {
   nix = {
@@ -84,6 +98,7 @@ in
 
       tldr
       tree
+      spf
       httpie
       glow
       neofetch
