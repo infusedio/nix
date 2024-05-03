@@ -122,6 +122,7 @@ in
 
       mysql
       dbeaver
+      beekeeper-studio
       qbittorrent
       calibre
 
@@ -439,6 +440,7 @@ in
       matchBlocks =
         let
           github = "github.com";
+
         in
         {
           ${github} = {
