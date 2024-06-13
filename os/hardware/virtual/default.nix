@@ -21,6 +21,8 @@ in
     };
 
     users.users.${dev.name}.extraGroups = [
+      "kvm"
+      "adbusers"
       "docker"
     ];
   };
