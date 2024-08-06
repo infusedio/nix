@@ -1,6 +1,13 @@
-{ config, inputs, lib, pkgs, dev, machine, settings, ... }:
-
-let
+{
+  config,
+  inputs,
+  lib,
+  pkgs,
+  dev,
+  machine,
+  settings,
+  ...
+}: let
   paths = {
     home = config.home.homeDirectory;
   };
@@ -16,7 +23,7 @@ let
       name = "alacritty";
 
       font = {
-        package = (nerdfonts.override { fonts = [ "JetBrainsMono" ]; });
+        package = nerdfonts.override {fonts = ["JetBrainsMono"];};
         name = "JetBrainsMono Nerd Font";
         size = dev.ui.font.size or 10;
       };
@@ -52,23 +59,7 @@ let
   };
 
   superfile = inputs.superfile.packages.${machine.system}.default;
-
-  # spf = pkgs.stdenv.mkDerivation {
-  #   name = "spf";
-  #   src = pkgs.fetchurl {
-  #     url = "https://github.com/MHNightCat/superfile/releases/download/v1.0.0/spf";
-  #     sha256 = "sha256-D0swlLGCrQCAihFuw+TFc8hqFBlHE1a7J2BrDy5uDPg=";
-  #   };
-  #   unpackPhase = "true";
-  #   installPhase = ''
-  #     mkdir -p $out/bin
-  #     cp $src $out/bin/spf
-  #     chmod +x $out/bin/spf
-  #   '';
-  # };
-
-in
-{
+in {
   nix = {
     settings = {
       extra-substituters = [
@@ -96,6 +87,7 @@ in
       lsof
       fd
       grc
+      xdg-utils
       tree-sitter
       superfile
 
@@ -138,6 +130,8 @@ in
       nodejs
       cargo
       eslint_d
+      nixd
+      alejandra
     ];
 
     pointerCursor = with ui.gtk.cursor; {
@@ -152,19 +146,36 @@ in
 
     # TODO: ingest all as a nix fileset and iterate into the "preload" hyprpaper command
     # TODO: the entire file handling situation here is not good, it should all be references to nix ingested files
-    file.".config/hypr/hyprpaper.conf" =
-      let
-        # NOTE: customize by just passing a path to an ingested asset
-        wallpaper = "${ui.assets}/wallpapers/wallhaven-y8er97.png";
-      in
-      {
-        text = ''
-          splash = false
+    file.".config/hypr/hyprpaper.conf" = let
+      # NOTE: customize by just passing a path to an ingested asset
+      wallpaper = "${ui.assets}/wallpapers/wallhaven-y8er97.png";
+    in {
+      text = ''
+        splash = false
 
-          preload = ${wallpaper}
-          wallpaper = ${(lib.head machine.devices.displays).output},${wallpaper}
-        '';
-      };
+        preload = ${wallpaper}
+        wallpaper = ${(lib.head machine.devices.displays).output},${wallpaper}
+      '';
+    };
+
+    # REFACT: better mimi: https://github.com/BachoSeven/mimi
+    # NOTE: https://github.com/march-linux/mimi
+    file.".config/mimi/mime.conf" = let
+      terminal = "${pkgs.alacritty}/bin/alacritty";
+      directory = "${superfile}/bin/superfile";
+      # text = "${pkgs.neovim}/bin/nvim"; # NOTE: this is not the same nvim as the one brought by home-manager
+      media = "${pkgs.vlc}/bin/vlc";
+    in {
+      # text/: ${terminal} -e ${text}
+      text = ''
+        inode/directory: ${terminal} -e ${directory} -
+        text/directory: ${terminal} -e ${directory}
+        application/x-directory: ${terminal} -e ${directory}
+        video/: ${media}
+        audio/: ${media}
+        # image/: feh
+      '';
+    };
   };
 
   services = {
@@ -209,7 +220,7 @@ in
         enable = true;
 
         # TODO: https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
-        styles = { };
+        styles = {};
       };
 
       plugins = [
@@ -221,73 +232,71 @@ in
       ];
 
       # NOTE: customize
-      shellAliases =
-        let
-          paths = {
-            flake = "$HOME/dev/${dev.handle}-nix";
-          };
-
-          commands = {
-            input = {
-              update = (input: flake_path: "nix flake lock --update-input ${input} ${flake_path}");
-            };
-            flake = {
-              build = (flake_path: "sudo nixos-rebuild build --flake ${flake_path} --show-trace");
-              switch = (flake_path: "sudo nixos-rebuild switch --flake ${flake_path} --show-trace");
-            };
-          };
-        in
-        {
-          # nix
-          switch = "${commands.input.update "infused-nix" paths.flake} && ${commands.flake.switch paths.flake}";
-
-          # zoxide
-          cd = "z";
-
-          # bun
-          b = "bun";
-          bx = "bunx";
-          bi = "bun install";
-          bid = "bun install -D";
-
-          # nx
-          n = "bunx nx";
-
-          # docker
-          d = "docker";
-
-          # containers
-          dgc = "docker ps";
-          dgca = "docker ps -a";
-
-          # kubernetes
-          k = "kubectl";
-
-          # all
-          kga = "kubectl get all";
-          kgaa = "kubectl get all --all-namespaces";
-
-          # node
-          kgn = "kubectl get nodes";
-
-          # pod
-          kgp = "kubectl get pods";
-          kgpa = "kubectl get pods --all-namespaces";
-          kdp = "kubectl describe pod";
-          kdpa = "kubectl describe pod --all-namespaces";
-
-          # deployment
-          kgd = "kubectl get deployments";
-          kgda = "kubectl get deployments --all-namespaces";
-          kdd = "kubectl describe deployment";
-          kdda = "kubectl describe deployment --all-namespaces";
-
-          # service
-          kgs = "kubectl get services";
-          kgsa = "kubectl get services --all-namespaces";
-          kds = "kubectl describe service";
-          kdsa = "kubectl describe service --all-namespaces";
+      shellAliases = let
+        paths = {
+          flake = "$HOME/dev/${dev.handle}-nix";
         };
+
+        commands = {
+          input = {
+            update = input: flake_path: "nix flake lock --update-input ${input} ${flake_path}";
+          };
+          flake = {
+            build = flake_path: "sudo nixos-rebuild build --flake ${flake_path} --show-trace";
+            switch = flake_path: "sudo nixos-rebuild switch --flake ${flake_path} --show-trace";
+          };
+        };
+      in {
+        # nix
+        switch = "${commands.input.update "infused-nix" paths.flake} && ${commands.flake.switch paths.flake}";
+
+        # zoxide
+        cd = "z";
+
+        # bun
+        b = "bun";
+        bx = "bunx";
+        bi = "bun install";
+        bid = "bun install -D";
+
+        # nx
+        n = "bunx nx";
+
+        # docker
+        d = "docker";
+
+        # containers
+        dgc = "docker ps";
+        dgca = "docker ps -a";
+
+        # kubernetes
+        k = "kubectl";
+
+        # all
+        kga = "kubectl get all";
+        kgaa = "kubectl get all --all-namespaces";
+
+        # node
+        kgn = "kubectl get nodes";
+
+        # pod
+        kgp = "kubectl get pods";
+        kgpa = "kubectl get pods --all-namespaces";
+        kdp = "kubectl describe pod";
+        kdpa = "kubectl describe pod --all-namespaces";
+
+        # deployment
+        kgd = "kubectl get deployments";
+        kgda = "kubectl get deployments --all-namespaces";
+        kdd = "kubectl describe deployment";
+        kdda = "kubectl describe deployment --all-namespaces";
+
+        # service
+        kgs = "kubectl get services";
+        kgsa = "kubectl get services --all-namespaces";
+        kds = "kubectl describe service";
+        kdsa = "kubectl describe service --all-namespaces";
+      };
     };
 
     starship = {
@@ -295,40 +304,38 @@ in
       settings = {
         add_newline = false;
 
-        character =
-          let
-            modes = rec {
-              normal = {
-                symbol = "󰁔";
-                color = "#c3e88d";
-              };
-
-              insert = {
-                symbol = normal.symbol;
-                color = "#ff757f";
-              };
-
-              replace = {
-                symbol = insert.symbol;
-                color = "#c53b53";
-              };
-
-              visual = {
-                symbol = insert.symbol;
-                color = "#3d59a1";
-              };
+        character = let
+          modes = rec {
+            normal = {
+              symbol = "󰁔";
+              color = "#c3e88d";
             };
-          in
-          {
-            vimcmd_symbol = with modes.normal; "[${symbol}](bold ${color})";
-            error_symbol = "[](bold #ffc777)";
-            success_symbol = with modes.insert; "[${symbol}](bold ${color})";
 
-            # BUG: these do not have any effect, potentially due to zsh-vi-mode plugin treating these modes differently?
-            vimcmd_replace_one_symbol = with modes.replace; "[${symbol}](bold ${color})";
-            vimcmd_replace_symbol = with modes.replace; "[${symbol}](bold ${color})";
-            vimcmd_visual_symbol = with modes.visual; "[${symbol}](bold ${color})";
+            insert = {
+              symbol = normal.symbol;
+              color = "#ff757f";
+            };
+
+            replace = {
+              symbol = insert.symbol;
+              color = "#c53b53";
+            };
+
+            visual = {
+              symbol = insert.symbol;
+              color = "#3d59a1";
+            };
           };
+        in {
+          vimcmd_symbol = with modes.normal; "[${symbol}](bold ${color})";
+          error_symbol = "[](bold #ffc777)";
+          success_symbol = with modes.insert; "[${symbol}](bold ${color})";
+
+          # BUG: these do not have any effect, potentially due to zsh-vi-mode plugin treating these modes differently?
+          vimcmd_replace_one_symbol = with modes.replace; "[${symbol}](bold ${color})";
+          vimcmd_replace_symbol = with modes.replace; "[${symbol}](bold ${color})";
+          vimcmd_visual_symbol = with modes.visual; "[${symbol}](bold ${color})";
+        };
 
         nix_shell = {
           format = "via [$symbol]($style)";
@@ -343,14 +350,14 @@ in
       enableZshIntegration = true;
 
       # https://github.com/ajeetdsouza/zoxide?tab=readme-ov-file#configuration
-      options = [ ];
+      options = [];
     };
 
     ripgrep = {
       enable = true;
 
       # https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md#configuration-filefor
-      arguments = [ ];
+      arguments = [];
     };
 
     fzf = {
@@ -361,7 +368,7 @@ in
         enableShellIntegration = true;
 
         # fzf-tmux --help for available options
-        shellIntegrationOptions = [ ];
+        shellIntegrationOptions = [];
       };
     };
 
@@ -439,18 +446,15 @@ in
       serverAliveInterval = 240;
       serverAliveCountMax = 2;
 
-      matchBlocks =
-        let
-          github = "github.com";
-
-        in
-        {
-          ${github} = {
-            hostname = github;
-            user = dev.name;
-            identityFile = "~/.ssh/${dev.name}.pem";
-          };
+      matchBlocks = let
+        github = "github.com";
+      in {
+        ${github} = {
+          hostname = github;
+          user = dev.name;
+          identityFile = "~/.ssh/${dev.name}.pem";
         };
+      };
     };
 
     gpg = {
@@ -669,208 +673,205 @@ in
 
   fonts.fontconfig.enable = true;
 
-  wayland.windowManager.hyprland =
-    let
-      keymap = {
-        prefix = "SUPER";
-        nav = "${keymap.prefix}";
-        move = "SHIFT_${keymap.prefix}";
-        resize = "CTRL_SHIFT_${keymap.prefix}";
-        slide = "ALT_${keymap.prefix}";
-        teleport = "SHIFT_ALT_${keymap.prefix}";
+  wayland.windowManager.hyprland = let
+    keymap = {
+      prefix = "SUPER";
+      nav = "${keymap.prefix}";
+      move = "SHIFT_${keymap.prefix}";
+      resize = "CTRL_SHIFT_${keymap.prefix}";
+      slide = "ALT_${keymap.prefix}";
+      teleport = "SHIFT_ALT_${keymap.prefix}";
+    };
+  in {
+    enable = true;
+
+    settings = with pkgs; {
+      "exec-once" = [
+        "${swayosd}/bin/swayosd-server &"
+        "${hyprpaper}/bin/hyprpaper &"
+
+        "${alacritty}/bin/alacritty --title \"PERSISTENT_WORKSPACE_1\" &"
+        "${alacritty}/bin/alacritty --title \"PERSISTENT_WORKSPACE_2\" &"
+        "${alacritty}/bin/alacritty --title \"PERSISTENT_WORKSPACE_3\" &"
+
+        "${alacritty}/bin/alacritty --title \"P_TERMINAL_1\" --option \"window.padding={x=20,y=20}\" &"
+        "${alacritty}/bin/alacritty --title \"P_TERMINAL_2\" --option \"window.padding={x=20,y=20}\" &"
+
+        "${alacritty}/bin/alacritty --title \"MAIN_TERMINAL_1\" --command tmux attach &"
+
+        "${webcord}/bin/webcord &"
+        "${slack}/bin/slack &"
+        "${spotify}/bin/spotify &"
+      ];
+
+      monitor = with lib.head machine.devices.displays; "${output},${toString resolution.width}x${toString resolution.height}@${toString resolution.at},0x0,1";
+
+      general = {
+        layout = "master";
+
+        border_size = 0;
+        # TODO: should come from theme palette
+        "col.inactive_border" = "0xff3d59a1 0xff394b70 45deg";
+        "col.active_border" = "0xffbb9af7 0xff9d7cd8 45deg";
+
+        # NOTE: customizable
+        gaps_in = 5;
+        gaps_out = 5;
+        gaps_workspaces = 5;
+
+        no_cursor_warps = true;
+        resize_on_border = true;
+        no_focus_fallback = true;
       };
 
-    in
-    {
-      enable = true;
+      dwindle = {
+        force_split = 2;
+        smart_resizing = false;
+      };
 
-      settings = with pkgs; {
-        "exec-once" = [
-          "${alacritty}/bin/alacritty --title \"PERSISTENT_WORKSPACE_1\" &"
-          "${alacritty}/bin/alacritty --title \"PERSISTENT_WORKSPACE_2\" &"
-          "${alacritty}/bin/alacritty --title \"PERSISTENT_WORKSPACE_3\" &"
+      master = {
+        orientation = "center";
+        always_center_master = true;
+        new_is_master = false;
+        new_on_top = false;
+      };
 
-          "${hyprpaper}/bin/hyprpaper &"
+      input = {
+        repeat_delay = "200";
+        repeat_rate = "65";
 
-          "${alacritty}/bin/alacritty --title \"P_TERMINAL_1\" --option \"window.padding={x=20,y=20}\" &"
-          "${alacritty}/bin/alacritty --title \"P_TERMINAL_2\" --option \"window.padding={x=20,y=20}\" &"
+        follow_mouse = 2;
+        mouse_refocus = false;
+      };
 
-          "${alacritty}/bin/alacritty --title \"MAIN_TERMINAL_1\" --command tmux attach &"
+      workspace = [
+        "special:p,persistent:true,bordersize:2,gapsin:40,gapsout:40"
 
-          "${webcord}/bin/webcord &"
-          "${slack}/bin/slack &"
-          "${spotify}/bin/spotify &"
+        "1,persistent:true"
+        "2,persistent:true,default:true"
+        "3,persistent:true"
+      ];
 
-          "${swayosd}/bin/swayosd-server &"
-        ];
+      windowrulev2 = [
+        "float,title:^PERSISTENT_WORKSPACE.*$"
+        "nofocus,title:^PERSISTENT_WORKSPACE.*$"
+        "noblur,title:^PERSISTENT_WORKSPACE.*$"
+        "size 0 0,title:^PERSISTENT_WORKSPACE.*$"
+        "move 0 0,title:^PERSISTENT_WORKSPACE.*$"
+        "opacity 0,title:^PERSISTENT_WORKSPACE.*$"
+        "workspace 1 silent,title:^(PERSISTENT_WORKSPACE_1)$"
+        "workspace 2 silent,title:^(PERSISTENT_WORKSPACE_2)$"
+        "workspace 3 silent,title:^(PERSISTENT_WORKSPACE_3)$"
 
-        monitor = with lib.head machine.devices.displays;
-          "${output},${toString resolution.width}x${toString resolution.height}@${toString resolution.at},0x0,1";
+        "workspace 2,title:^(MAIN_TERMINAL_1)$"
 
-        general = {
-          layout = "master";
+        "workspace 3 silent,class:^(WebCord)$"
+        "workspace 3 silent,class:^(Slack)$"
 
-          border_size = 0;
-          # TODO: should come from theme palette
-          "col.inactive_border" = "0xff3d59a1 0xff394b70 45deg";
-          "col.active_border" = "0xffbb9af7 0xff9d7cd8 45deg";
+        "workspace special:p silent,title:^(P_TERMINAL_1)$"
+        "workspace special:p silent,title:^(P_TERMINAL_2)$"
+        "workspace special:p silent,title:^(Spotify)"
 
-          # NOTE: customizable
-          gaps_in = 5;
-          gaps_out = 5;
-          gaps_workspaces = 5;
+        "float,title:^Bitwarden$"
+        "float,class:^(pavucontrol)$"
+      ];
 
-          no_cursor_warps = true;
-          resize_on_border = true;
-          no_focus_fallback = true;
+      bind = with keymap; [
+        "${prefix},q,killactive"
+
+        "${prefix},return,exec,${alacritty}/bin/alacritty"
+
+        "${prefix},d,exec,${webcord}/bin/webcord --disable-features=WaylandFractionalScaleV1"
+        "${prefix},m,exec,${spotify}/bin/spotify --disable-features=WaylandFractionalScaleV1"
+        "${prefix},w,exec,${google-chrome}/bin/google-chrome-stable --restore-last-session --hide-crash-restore-bubble --disable-features=WaylandFractionalScaleV1"
+        "${prefix},s,exec,${grimblast}/bin/grimblast copy area"
+        "ALT_${prefix},s,exec,${grimblast}/bin/grimblast copy screen"
+        "${prefix},l,exec,${slack}/bin/slack"
+        "${prefix},b,exec,${dbeaver}/bin/dbeaver"
+
+        "${nav},up,movefocus,u"
+        "${nav},right,movefocus,r"
+        "${nav},down,movefocus,d"
+        "${nav},left,movefocus,l"
+
+        "${move},up,movewindow,u"
+        "${move},right,movewindow,r"
+        "${move},down,movewindow,d"
+        "${move},left,movewindow,l"
+
+        "${resize},f,fullscreen,0"
+        "${resize},g,fakefullscreen"
+
+        "${prefix},f,togglefloating"
+        "${prefix},t,pin"
+        "${prefix},c,centerwindow"
+
+        "${slide},right,workspace,e+1"
+        "${slide},left,workspace,e-1"
+        "${slide},mouse_up,workspace,e+1"
+        "${slide},mouse_down,workspace,e-1"
+        "${prefix},p,togglespecialworkspace,p"
+
+        "${teleport},right,movetoworkspacesilent,e+1"
+        "${teleport},left,movetoworkspacesilent,e-1"
+        "${teleport},p,movetoworkspacesilent,special:p"
+
+        ",XF86AudioPlay,exec,${playerctl}/bin/playerctl play-pause --player spotify"
+        ",XF86AudioNext,exec,${playerctl}/bin/playerctl next --player spotify"
+        ",XF86AudioPrev,exec,${playerctl}/bin/playerctl previous --player spotify"
+
+        "${prefix},XF86AudioPlay,exec,${playerctl}/bin/playerctl play-pause --player chromium"
+        "${prefix},XF86AudioNext,exec,${playerctl}/bin/playerctl position 3+ --player chromium"
+        "${prefix},XF86AudioPrev,exec,${playerctl}/bin/playerctl position 3- --player chromium"
+        "${move},XF86AudioNext,exec,${playerctl}/bin/playerctl position 10+ --player chromium"
+        "${move},XF86AudioPrev,exec,${playerctl}/bin/playerctl position 10- --player chromium"
+      ];
+
+      # TODO: remove shift modifier when corne keymap has been updated to fix the media layer
+      binde = with keymap; [
+        "${resize},up,resizeactive,0 -20"
+        "${resize},right,resizeactive,20 0"
+        "${resize},down,resizeactive,0 20"
+        "${resize},left,resizeactive,-20 0"
+
+        ",XF86AudioRaiseVolume,exec,${swayosd}/bin/swayosd-client --output-volume=\"+1\""
+        ",XF86AudioLowerVolume,exec,${swayosd}/bin/swayosd-client --output-volume=\"-1\""
+      ];
+
+      bindm = with keymap; [
+        "${move},mouse:272,movewindow"
+        "${resize},mouse:272,resizewindow"
+      ];
+
+      decoration = {
+        rounding = 7;
+
+        active_opacity = 1.00;
+        inactive_opacity = 0.95;
+        fullscreen_opacity = 1.00;
+        dim_special = 0.75;
+        blur = {
+          popups = true;
         };
+      };
 
-        dwindle = {
-          force_split = 2;
-          smart_resizing = false;
-        };
+      bezier = [
+        "easeOutQuint,0.22,1,0.36,1"
+        "easeInOutQuint,0.83,0,0.17,1"
+      ];
 
-        master = {
-          orientation = "center";
-          always_center_master = true;
-          new_is_master = false;
-          new_on_top = false;
-        };
+      animation = [
+        "workspaces,1,2,easeInOutQuint,slide"
+        "specialWorkspace,1,3,easeOutQuint,fade"
+        "windows,1,2,easeOutQuint,popin"
+      ];
 
-        input = {
-          repeat_delay = "200";
-          repeat_rate = "65";
+      misc = {
+        disable_hyprland_logo = true;
+        disable_splash_rendering = true;
 
-          follow_mouse = 2;
-          mouse_refocus = false;
-        };
-
-        workspace = [
-          "special:p,persistent:true,bordersize:2,gapsin:40,gapsout:40"
-
-          "1,persistent:true"
-          "2,persistent:true,default:true"
-          "3,persistent:true"
-        ];
-
-        windowrulev2 = [
-          "float,title:^PERSISTENT_WORKSPACE.*$"
-          "nofocus,title:^PERSISTENT_WORKSPACE.*$"
-          "noblur,title:^PERSISTENT_WORKSPACE.*$"
-          "size 0 0,title:^PERSISTENT_WORKSPACE.*$"
-          "move 0 0,title:^PERSISTENT_WORKSPACE.*$"
-          "opacity 0,title:^PERSISTENT_WORKSPACE.*$"
-          "workspace 1 silent,title:^(PERSISTENT_WORKSPACE_1)$"
-          "workspace 2 silent,title:^(PERSISTENT_WORKSPACE_2)$"
-          "workspace 3 silent,title:^(PERSISTENT_WORKSPACE_3)$"
-
-          "workspace 2,title:^(MAIN_TERMINAL_1)$"
-
-          "workspace 3 silent,class:^(WebCord)$"
-          "workspace 3 silent,class:^(Slack)$"
-
-          "workspace special:p silent,title:^(P_TERMINAL_1)$"
-          "workspace special:p silent,title:^(P_TERMINAL_2)$"
-          "workspace special:p silent,title:^(Spotify)"
-
-          "float,title:^Bitwarden$"
-          "float,class:^(pavucontrol)$"
-        ];
-
-        bind =
-          with keymap; [
-            "${prefix},q,killactive"
-
-            "${prefix},return,exec,${alacritty}/bin/alacritty"
-
-            "${prefix},d,exec,${webcord}/bin/webcord --disable-features=WaylandFractionalScaleV1"
-            "${prefix},m,exec,${spotify}/bin/spotify --disable-features=WaylandFractionalScaleV1"
-            "${prefix},w,exec,${google-chrome}/bin/google-chrome-stable --restore-last-session --hide-crash-restore-bubble --disable-features=WaylandFractionalScaleV1"
-            "${prefix},s,exec,${grimblast}/bin/grimblast copy area"
-            "ALT_${prefix},s,exec,${grimblast}/bin/grimblast copy screen"
-
-            "${nav},up,movefocus,u"
-            "${nav},right,movefocus,r"
-            "${nav},down,movefocus,d"
-            "${nav},left,movefocus,l"
-
-            "${move},up,movewindow,u"
-            "${move},right,movewindow,r"
-            "${move},down,movewindow,d"
-            "${move},left,movewindow,l"
-
-            "${resize},f,fullscreen,0"
-            "${resize},g,fakefullscreen"
-
-            "${prefix},f,togglefloating"
-            "${prefix},t,pin"
-            "${prefix},c,centerwindow"
-
-            "${slide},right,workspace,e+1"
-            "${slide},left,workspace,e-1"
-            "${slide},mouse_up,workspace,e+1"
-            "${slide},mouse_down,workspace,e-1"
-            "${prefix},p,togglespecialworkspace,p"
-
-            "${teleport},right,movetoworkspacesilent,e+1"
-            "${teleport},left,movetoworkspacesilent,e-1"
-            "${teleport},p,movetoworkspacesilent,special:p"
-
-            "ALT_${prefix},XF86AudioPlay,exec,${playerctl}/bin/playerctl play-pause --all-players"
-            "${prefix},XF86AudioPlay,exec,${playerctl}/bin/playerctl play-pause --player chromium"
-            ",XF86AudioPlay,exec,${playerctl}/bin/playerctl play-pause --player spotify"
-
-            ",XF86AudioNext,exec,${playerctl}/bin/playerctl next --player spotify"
-            ",XF86AudioPrev,exec,${playerctl}/bin/playerctl previous --player spotify"
-          ];
-
-        # TODO: remove shift modifier when corne keymap has been updated to fix the media layer
-        binde = with keymap; [
-          "${resize},up,resizeactive,0 -20"
-          "${resize},right,resizeactive,20 0"
-          "${resize},down,resizeactive,0 20"
-          "${resize},left,resizeactive,-20 0"
-
-          "SHIFT,XF86AudioRaiseVolume,exec,${swayosd}/bin/swayosd-client --output-volume=\"+1\""
-          "SHIFT,XF86AudioLowerVolume,exec,${swayosd}/bin/swayosd-client --output-volume=\"-1\""
-        ];
-
-        bindm = with keymap; [
-          "${move},mouse:272,movewindow"
-          "${resize},mouse:272,resizewindow"
-        ];
-
-        decoration = {
-          rounding = 7;
-
-          active_opacity = 1.00;
-          inactive_opacity = 0.95;
-          fullscreen_opacity = 1.00;
-          dim_special = 0.75;
-          blur = {
-            popups = true;
-          };
-        };
-
-        bezier = [
-          "easeOutQuint,0.22,1,0.36,1"
-          "easeInOutQuint,0.83,0,0.17,1"
-        ];
-
-        animation = [
-          "workspaces,1,2,easeInOutQuint,slide"
-          "specialWorkspace,1,3,easeOutQuint,fade"
-          "windows,1,2,easeOutQuint,popin"
-        ];
-
-        misc = {
-          disable_hyprland_logo = true;
-          disable_splash_rendering = true;
-
-          vrr = 1;
-        };
+        vrr = 1;
       };
     };
+  };
 }
-
-
