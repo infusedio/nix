@@ -1,10 +1,11 @@
-input@{ lib, pkgs, dev, ... }:
-
-let
+input @ {
+  lib,
+  pkgs,
+  dev,
+  ...
+}: let
   config = input.config.os.environment;
-
-in
-{
+in {
   options.os.environment = {
     i18n = {
       timezone = lib.mkOption {
@@ -20,12 +21,12 @@ in
     packages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       description = "List of packages to be installed on the system level";
-      default = [ ];
+      default = [];
     };
 
     libraries = lib.mkOption {
       type = lib.types.listOf lib.types.package;
-      default = [ ];
+      default = [];
       description = "List of libraries to be dynamically linked through `nix-ld`";
     };
 
@@ -36,14 +37,14 @@ in
       };
       groups = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = [ ];
+        default = [];
       };
     };
 
     shell = {
       variables = lib.mkOption {
         type = lib.types.attrsOf lib.types.str;
-        default = { };
+        default = {};
       };
     };
   };
@@ -69,24 +70,29 @@ in
     };
 
     environment = {
-      systemPackages = with pkgs; [
-        git
-        curl
-        wget
-        btop
-        neovim
-      ] ++ config.packages;
+      systemPackages = with pkgs;
+        [
+          git
+          curl
+          wget
+          lsyncd
+          btop
+          neovim
+        ]
+        ++ config.packages;
 
-      variables = {
-        EDITOR = "nvim";
-        VISUAL = "nvim";
-      } // config.shell.variables;
+      variables =
+        {
+          EDITOR = "nvim";
+          VISUAL = "nvim";
+        }
+        // config.shell.variables;
     };
 
     programs.nix-ld = {
       enable = true;
 
-      libraries = with pkgs; [ ] ++ config.libraries;
+      libraries = with pkgs; [] ++ config.libraries;
     };
 
     programs = {
@@ -105,11 +111,12 @@ in
       users.${config.user.name} = {
         isNormalUser = true;
 
-        extraGroups = [
-          "wheel"
-        ] ++ config.user.groups;
+        extraGroups =
+          [
+            "wheel"
+          ]
+          ++ config.user.groups;
       };
     };
   };
 }
-
