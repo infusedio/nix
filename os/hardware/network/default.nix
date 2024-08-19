@@ -1,10 +1,12 @@
-input@{ lib, pkgs, dev, machine, ... }:
-
-let
+input @ {
+  lib,
+  pkgs,
+  dev,
+  machine,
+  ...
+}: let
   config = input.config.os.hardware.network;
-
-in
-{
+in {
   options.os.hardware.network = {
     open = lib.mkOption {
       type = lib.types.bool;
@@ -15,7 +17,7 @@ in
     ports = lib.mkOption {
       type = lib.types.listOf lib.types.int;
       description = "Ports to open on the host machine";
-      default = [ ];
+      default = [];
     };
 
     hosts = lib.mkOption {
@@ -54,7 +56,7 @@ in
 
         insertNameservers = (
           {
-            isp = [ ];
+            isp = [];
             google = [
               "8.8.8.8"
               "8.8.4.4"
@@ -67,7 +69,8 @@ in
               "2606:4700:4700::1111"
               "2606:4700:4700::1001"
             ];
-          }.${config.dns}
+          }
+          .${config.dns}
         );
       };
 
@@ -83,6 +86,13 @@ in
 
     services.openssh = {
       enable = config.open;
+
+      allowSFTP = false;
+      settings = {
+        PermitRootLogin = "no";
+        PasswordAuthentication = false;
+        KbdInteractiveAuthentication = false;
+      };
     };
   };
 }
