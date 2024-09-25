@@ -1,8 +1,9 @@
-{
+input @ {
   config,
   inputs,
   lib,
   pkgs,
+  pkgs-latest,
   dev,
   machine,
   settings,
@@ -78,61 +79,65 @@ in {
     username = dev.name;
     homeDirectory = "/home/${dev.name}";
 
-    packages = with pkgs; [
-      ntfs3g
+    packages =
+      (with pkgs; [
+        ntfs3g
 
-      wget
-      zip
-      unzip
-      lsof
-      fd
-      grc
-      xdg-utils
-      tree-sitter
-      superfile
+        wget
+        zip
+        unzip
+        lsof
+        fd
+        grc
+        xdg-utils
 
-      tldr
-      tree
-      httpie
-      glow
-      neofetch
-      nix-output-monitor
+        tldr
+        tree
+        httpie
+        glow
+        neofetch
+        nix-output-monitor
 
-      cloudflared
-      speedtest-cli
+        mysql
 
-      wev
-      wl-clipboard
-      grimblast
-      playerctl
-      pavucontrol
+        ui.terminal.font.package
+        ui.gtk.font.package
 
-      google-chrome
-      spotify
-      vlc
-      slack
-      discord
-      webcord
+        hyprpaper # TODO: move to hyprland
 
-      mysql
-      dbeaver
-      beekeeper-studio
-      qbittorrent
-      calibre
+        # TODO: define in project flakes:
+        # these are to enable relevant lsps in neovim
+        nodejs
+        cargo
+        eslint_d
+        nixd
+        alejandra
+      ])
+      ++ (with pkgs-latest; [
+        tree-sitter
+        superfile
 
-      ui.terminal.font.package
-      ui.gtk.font.package
+        wev
+        wl-clipboard
+        grimblast
+        playerctl
+        pavucontrol
 
-      hyprpaper # TODO: move to hyprland
+        cloudflared
 
-      # TODO: define in project flakes:
-      # these are to enable relevant lsps in neovim
-      nodejs
-      cargo
-      eslint_d
-      nixd
-      alejandra
-    ];
+        google-chrome
+        spotify
+        vlc
+        slack
+        discord
+        webcord
+
+        dbeaver-bin
+        beekeeper-studio
+
+        qbittorrent
+        calibre
+      ]);
 
     pointerCursor = with ui.gtk.cursor; {
       inherit package name size;
@@ -183,7 +188,7 @@ in {
       enable = true;
 
       enableZshIntegration = true;
-      pinentryPackage = pkgs.pinentry-curses;
+      pinentryPackage = pkgs-latest.pinentry-curses;
 
       defaultCacheTtl = 604800; # 1 week
       maxCacheTtl = 604800; # 1 week
@@ -197,6 +202,8 @@ in {
 
     swayosd = {
       enable = true;
+
+      package = pkgs-latest.swayosd;
     };
 
     playerctld = {
@@ -218,9 +225,6 @@ in {
 
       syntaxHighlighting = {
         enable = true;
-
-        # TODO: https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
-        styles = {};
       };
 
       plugins = [
@@ -395,6 +399,10 @@ in {
       enable = true;
     };
 
+    go = {
+      enable = true;
+    };
+
     alacritty = with ui.terminal; {
       enable = true;
 
@@ -443,8 +451,8 @@ in {
     ssh = {
       enable = true;
 
-      serverAliveInterval = 240;
-      serverAliveCountMax = 2;
+      serverAliveInterval = 30;
+      serverAliveCountMax = 5;
 
       matchBlocks = let
         github = "github.com";
@@ -549,7 +557,7 @@ in {
         # windows
         set-option -g renumber-windows "on"
 
-        # NOTE: navigate between tmux windows with ctrl+alt+arrow, needs to be backed by alacritty keys defined in: github:medv-vault/.medv
+        # NOTE: navigate between tmux windows with ctrl+alt+arrow, needs to be backed by alacritty keys
         # set -s user-keys[0] "\e[1;6D" # Ctrl+Alt+Left (defined in alacritty.yml)
         # set -s user-keys[1] "\e[1;6C" # Ctrl+Alt+Right (defined in alacritty.yml)
         bind-key -n User0 previous-window
@@ -590,6 +598,8 @@ in {
     lazygit = {
       enable = true;
 
+      package = pkgs-latest.lazygit;
+
       settings = {
         disableStartupPopups = true;
         confirmOnQuit = true;
@@ -628,6 +638,8 @@ in {
 
     k9s = {
       enable = true;
+
+      package = pkgs-latest.k9s;
 
       settings = {
         refreshRate = 1;
@@ -687,7 +699,7 @@ in {
 
     settings = with pkgs; {
       "exec-once" = [
-        "${swayosd}/bin/swayosd-server &"
+        "${pkgs-latest.swayosd}/bin/swayosd-server &"
         "${hyprpaper}/bin/hyprpaper &"
 
         "${alacritty}/bin/alacritty --title \"PERSISTENT_WORKSPACE_1\" &"
@@ -699,9 +711,9 @@ in {
 
         "${alacritty}/bin/alacritty --title \"MAIN_TERMINAL_1\" --command tmux attach &"
 
-        "${webcord}/bin/webcord &"
-        "${slack}/bin/slack &"
-        "${spotify}/bin/spotify &"
+        "${pkgs-latest.webcord}/bin/webcord &"
+        "${pkgs-latest.slack}/bin/slack &"
+        "${pkgs-latest.spotify}/bin/spotify &"
       ];
 
       monitor = with lib.head machine.devices.displays; "${output},${toString resolution.width}x${toString resolution.height}@${toString resolution.at},0x0,1";
@@ -781,13 +793,13 @@ in {
 
         "${prefix},return,exec,${alacritty}/bin/alacritty"
 
-        "${prefix},d,exec,${webcord}/bin/webcord --disable-features=WaylandFractionalScaleV1"
-        "${prefix},m,exec,${spotify}/bin/spotify --disable-features=WaylandFractionalScaleV1"
-        "${prefix},w,exec,${google-chrome}/bin/google-chrome-stable --restore-last-session --hide-crash-restore-bubble --disable-features=WaylandFractionalScaleV1"
-        "${prefix},s,exec,${grimblast}/bin/grimblast copy area"
-        "ALT_${prefix},s,exec,${grimblast}/bin/grimblast copy screen"
-        "${prefix},l,exec,${slack}/bin/slack"
-        "${prefix},b,exec,${dbeaver}/bin/dbeaver"
+        "${prefix},d,exec,${pkgs-latest.webcord}/bin/webcord --disable-features=WaylandFractionalScaleV1"
+        "${prefix},m,exec,${pkgs-latest.spotify}/bin/spotify --disable-features=WaylandFractionalScaleV1"
+        "${prefix},w,exec,${pkgs-latest.google-chrome}/bin/google-chrome-stable --restore-last-session --hide-crash-restore-bubble --disable-features=WaylandFractionalScaleV1"
+        "${prefix},s,exec,${pkgs-latest.grimblast}/bin/grimblast copy area"
+        "ALT_${prefix},s,exec,${pkgs-latest.grimblast}/bin/grimblast copy screen"
+        "${prefix},l,exec,${pkgs-latest.slack}/bin/slack"
+        "${prefix},b,exec,${pkgs-latest.dbeaver-bin}/bin/dbeaver"
 
         "${nav},up,movefocus,u"
         "${nav},right,movefocus,r"
@@ -816,15 +828,15 @@ in {
         "${teleport},left,movetoworkspacesilent,e-1"
         "${teleport},p,movetoworkspacesilent,special:p"
 
-        ",XF86AudioPlay,exec,${playerctl}/bin/playerctl play-pause --player spotify"
-        ",XF86AudioNext,exec,${playerctl}/bin/playerctl next --player spotify"
-        ",XF86AudioPrev,exec,${playerctl}/bin/playerctl previous --player spotify"
+        ",XF86AudioPlay,exec,${pkgs-latest.playerctl}/bin/playerctl play-pause --player spotify"
+        ",XF86AudioNext,exec,${pkgs-latest.playerctl}/bin/playerctl next --player spotify"
+        ",XF86AudioPrev,exec,${pkgs-latest.playerctl}/bin/playerctl previous --player spotify"
 
-        "${prefix},XF86AudioPlay,exec,${playerctl}/bin/playerctl play-pause --player chromium"
-        "${prefix},XF86AudioNext,exec,${playerctl}/bin/playerctl position 3+ --player chromium"
-        "${prefix},XF86AudioPrev,exec,${playerctl}/bin/playerctl position 3- --player chromium"
-        "${move},XF86AudioNext,exec,${playerctl}/bin/playerctl position 10+ --player chromium"
-        "${move},XF86AudioPrev,exec,${playerctl}/bin/playerctl position 10- --player chromium"
+        "${prefix},XF86AudioPlay,exec,${pkgs-latest.playerctl}/bin/playerctl play-pause --player chromium"
+        "${prefix},XF86AudioNext,exec,${pkgs-latest.playerctl}/bin/playerctl position 3+ --player chromium"
+        "${prefix},XF86AudioPrev,exec,${pkgs-latest.playerctl}/bin/playerctl position 3- --player chromium"
+        "${move},XF86AudioNext,exec,${pkgs-latest.playerctl}/bin/playerctl position 10+ --player chromium"
+        "${move},XF86AudioPrev,exec,${pkgs-latest.playerctl}/bin/playerctl position 10- --player chromium"
       ];
 
       # TODO: remove shift modifier when corne keymap has been updated to fix the media layer
@@ -834,8 +846,8 @@ in {
         "${resize},down,resizeactive,0 20"
         "${resize},left,resizeactive,-20 0"
 
-        ",XF86AudioRaiseVolume,exec,${swayosd}/bin/swayosd-client --output-volume=\"+1\""
-        ",XF86AudioLowerVolume,exec,${swayosd}/bin/swayosd-client --output-volume=\"-1\""
+        ",XF86AudioRaiseVolume,exec,${pkgs-latest.swayosd}/bin/swayosd-client --output-volume=\"+1\""
+        ",XF86AudioLowerVolume,exec,${pkgs-latest.swayosd}/bin/swayosd-client --output-volume=\"-1\""
       ];
 
       bindm = with keymap; [

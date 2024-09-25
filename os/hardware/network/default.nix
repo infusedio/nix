@@ -54,6 +54,7 @@ in {
       networkmanager = {
         enable = true;
 
+        dns = "none";
         insertNameservers = (
           {
             isp = [];
@@ -92,6 +93,7 @@ in {
         PermitRootLogin = "no";
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
+        UseDns = false;
       };
     };
   };

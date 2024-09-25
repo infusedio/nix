@@ -5,22 +5,24 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
-  outputs = inputs@{ self, nixpkgs, ... }:
-    {
-      nixosModules = {
-        default = ./std;
+  outputs = inputs @ {
+    self,
+    nixpkgs,
+    ...
+  }: {
+    nixosModules = {
+      default = ./std;
 
-        std = ./std;
-        os = ./os;
-        dev = ./dev;
-      };
-
-      devShells = {
-        # default = ./env;
-        # nix = ./env/nix;
-        # ts = ./env/ts;
-        # php = ./env/php;
-      };
+      std = ./std;
+      os = ./os;
+      dev = ./dev;
     };
-}
 
+    devShells = {
+      # default = ./env;
+      # nix = ./env/nix;
+      # ts = ./env/ts;
+      # php = ./env/php;
+    };
+  };
+}

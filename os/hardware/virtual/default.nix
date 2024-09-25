@@ -1,10 +1,11 @@
-input@{ lib, dev, ... }:
-
-let
+input @ {
+  lib,
+  dev,
+  pkgs-latest,
+  ...
+}: let
   config = input.config.os.hardware.virtual;
-
-in
-{
+in {
   options.os.hardware.virtual = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -14,16 +15,31 @@ in
   };
 
   config = {
+    users.users.${dev.name}.extraGroups = [
+      "kvm"
+      "libvirtd"
+      "docker"
+      "adbusers"
+    ];
+
     virtualisation = {
+      libvirtd = {
+        enable = true;
+      };
+
       docker = {
         enable = lib.mkDefault config.enable;
+
+        package = pkgs-latest.docker;
       };
     };
 
-    users.users.${dev.name}.extraGroups = [
-      "kvm"
-      "adbusers"
-      "docker"
-    ];
+    programs = {
+      virt-manager = {
+        enable = lib.mkDefault config.enable;
+
+        package = pkgs-latest.virt-manager;
+      };
+    };
   };
 }
