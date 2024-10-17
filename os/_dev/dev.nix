@@ -93,13 +93,6 @@ in {
         html-tidy
         xdg-utils
 
-        tldr
-        tree
-        httpie
-        glow
-        neofetch
-        nix-output-monitor
-
         mysql
 
         ui.terminal.font.package
@@ -109,22 +102,33 @@ in {
 
         # TODO: define in project flakes:
         # these are to enable relevant lsps in neovim
+      ])
+      ++ (with pkgs-latest; [
+        tldr
+        tree
+
+        nix-output-monitor
+
+        httpie
+        glow
+        neofetch
+
+        tree-sitter
+        superfile
+
         nodejs
         cargo
         eslint_d
         nixd
         alejandra
         deadnix
-      ])
-      ++ (with pkgs-latest; [
-        tree-sitter
-        superfile
 
         wev
         wl-clipboard
         grimblast
         playerctl
         pavucontrol
+        ventoy-bin
 
         cloudflared
 
@@ -139,7 +143,7 @@ in {
         beekeeper-studio
 
         qbittorrent
-        calibre
+        # calibre FIX: python3.12-pyqt6-6.7.0 cannot compile (temporarily?)
 
         lazysql
         portal
