@@ -249,7 +249,7 @@ in {
 
         commands = {
           input = {
-            update = input: flake_path: "nix flake lock --update-input ${input} ${flake_path}";
+            update = input: flake_path: "sudo nix flake lock --update-input ${input} ${flake_path}";
           };
           flake = {
             build = flake_path: "sudo nixos-rebuild build --flake ${flake_path} --show-trace";
@@ -258,7 +258,7 @@ in {
         };
       in {
         # nix
-        switch = "${commands.input.update "infused-nix" paths.flake} && ${commands.flake.switch paths.flake}";
+        switch = "${commands.input.update "infused-nix" paths.flake} && (${commands.flake.switch paths.flake} |& ${pkgs-latest.nix-output-monitor}/bin/nom)";
 
         # zoxide
         cd = "z";
