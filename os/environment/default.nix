@@ -1,5 +1,6 @@
 input @ {
   lib,
+  inputs,
   pkgs,
   dev,
   ...
@@ -67,6 +68,10 @@ in {
         LC_TELEPHONE = locale;
         LC_TIME = locale;
       };
+    };
+
+    nix = {
+      nixPath = ["nixpkgs=${inputs.nixpkgs}"];
     };
 
     environment = {
