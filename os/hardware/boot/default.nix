@@ -1,11 +1,11 @@
-input@{ lib, pkgs, ... }:
-
-let
+input @ {
+  lib,
+  pkgs,
+  ...
+}: let
   config = input.config.os.hardware.boot;
-
-in
-{
-  options.os.hardware.boot = { };
+in {
+  options.os.hardware.boot = {};
 
   config = {
     boot = {

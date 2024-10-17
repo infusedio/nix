@@ -1,10 +1,11 @@
-input@{ lib, pkgs, modulesPath, ... }:
-
-let
+input @ {
+  lib,
+  pkgs,
+  modulesPath,
+  ...
+}: let
   config = input.config.os.hardware;
-
-in
-{
+in {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
 

@@ -84,11 +84,13 @@ in {
         ntfs3g
 
         wget
+        curl
         zip
         unzip
         lsof
         fd
         grc
+        html-tidy
         xdg-utils
 
         tldr
@@ -112,6 +114,7 @@ in {
         eslint_d
         nixd
         alejandra
+        deadnix
       ])
       ++ (with pkgs-latest; [
         tree-sitter
@@ -137,6 +140,9 @@ in {
 
         qbittorrent
         calibre
+
+        lazysql
+        portal
       ]);
 
     pointerCursor = with ui.gtk.cursor; {

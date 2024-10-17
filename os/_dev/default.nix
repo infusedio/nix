@@ -1,21 +1,29 @@
-input@{ inputs, ... }:
-
-let
+input @ {
+  inputs,
+  pkgs-latest,
+  ...
+}: let
   config = input.config._dev;
-
-in
-{
+in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    ({ self, inputs, home-manager, dev, machine, settings, ... }: {
-      nixpkgs.overlays = [ inputs.alacritty-theme.overlays.default ];
+    ({
+      self,
+      inputs,
+      home-manager,
+      dev,
+      machine,
+      settings,
+      ...
+    }: {
+      nixpkgs.overlays = [inputs.alacritty-theme.overlays.default];
 
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
 
         extraSpecialArgs = {
-          inherit self inputs dev machine settings;
+          inherit self inputs pkgs-latest dev machine settings;
         };
 
         users.${dev.name} = import ./dev.nix;
@@ -25,7 +33,7 @@ in
 
   # TODO: options are not set properly, we are using `dev` global set directly, this is not type safe
   # parametarize everything properly while refactoring #os._dev to its own output
-  options.os._dev = { };
+  options.os._dev = {};
 
-  config = { };
+  config = {};
 }

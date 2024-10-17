@@ -77,6 +77,7 @@ in {
     environment = {
       systemPackages = with pkgs;
         [
+          comma
           git
           curl
           wget
