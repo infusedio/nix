@@ -64,10 +64,12 @@ in {
   nix = {
     settings = {
       extra-substituters = [
+        "https://nix-community.cachix.org/" # nixpkgs-update
         "https://attic.alexghr.me/public" # inputs.alacritty-theme
       ];
 
       extra-trusted-public-keys = [
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" # nixpkgs-update
         "public:5MqPjBBGMCWbo8L8voeQl7HXc5oX+MXZ6BSURfMosIo=" # inputs.alacritty-theme
       ];
     };
