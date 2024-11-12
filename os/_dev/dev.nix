@@ -115,6 +115,8 @@ in {
         glow
         neofetch
 
+        lua51Packages.lua # NOTE: https://github.com/folke/lazy.nvim/issues/1570#issuecomment-2197414149
+        lua51Packages.luarocks
         tree-sitter
         superfile
 
