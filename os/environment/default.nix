@@ -81,6 +81,7 @@ in {
           git
           curl
           wget
+          gcc
           lsyncd
           btop
           neovim
