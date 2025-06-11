@@ -2,7 +2,7 @@ input@{ lib, pkgs, ... }:
 
 {
   config = lib.mkIf (input.config.os.hardware.video.platform == "amd") {
-    hardware.opengl = {
+    hardware.graphics = {
       extraPackages = with pkgs; [
         rocmPackages.clr.icd
         amdvlk

@@ -22,7 +22,7 @@ in
 
   config = lib.mkMerge [
     {
-      hardware.opengl.enable = true;
+      hardware.graphics.enable = true;
 
       environment = {
         sessionVariables = {
