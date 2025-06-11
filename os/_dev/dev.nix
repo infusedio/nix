@@ -24,13 +24,13 @@ input @ {
       name = "alacritty";
 
       font = {
-        package = nerdfonts.override {fonts = ["JetBrainsMono"];};
+        package = pkgs.nerd-fonts.jetbrains-mono;
         name = "JetBrainsMono Nerd Font";
         size = dev.ui.font.size or 10;
       };
 
       theme = {
-        package = alacritty-theme.tokyo-night;
+        package = alacritty-theme.tokyo_night;
       };
     };
 
@@ -53,13 +53,11 @@ input @ {
       };
 
       icon = {
-        package = gnome.adwaita-icon-theme;
+        package = adwaita-icon-theme;
         name = "Adwaita";
       };
     };
   };
-
-  superfile = inputs.superfile.packages.${machine.system}.default;
 in {
   nix = {
     settings = {
@@ -95,7 +93,7 @@ in {
         html-tidy
         xdg-utils
 
-        mysql
+        mariadb
 
         ui.terminal.font.package
         ui.gtk.font.package
@@ -118,7 +116,6 @@ in {
         lua51Packages.lua # NOTE: https://github.com/folke/lazy.nvim/issues/1570#issuecomment-2197414149
         lua51Packages.luarocks
         tree-sitter
-        superfile
 
         nodejs
         cargo
@@ -132,19 +129,19 @@ in {
         grimblast
         playerctl
         pavucontrol
-        ventoy-bin
+        # ventoy-bin
 
         cloudflared
 
         google-chrome
         spotify
         vlc
-        slack
+        # slack
         discord
         webcord
 
-        dbeaver-bin
-        beekeeper-studio
+        # dbeaver-bin
+        # beekeeper-studio
 
         qbittorrent
         # calibre FIX: python3.12-pyqt6-6.7.0 cannot compile (temporarily?)
@@ -179,27 +176,27 @@ in {
 
     # REFACT: better mimi: https://github.com/BachoSeven/mimi
     # NOTE: https://github.com/march-linux/mimi
-    file.".config/mimi/mime.conf" = let
-      terminal = "${pkgs.alacritty}/bin/alacritty";
-      directory = "${superfile}/bin/superfile";
-      # text = "${pkgs.neovim}/bin/nvim"; # NOTE: this is not the same nvim as the one brought by home-manager
-      media = "${pkgs.vlc}/bin/vlc";
-    in {
-      # text/: ${terminal} -e ${text}
-      text = ''
-        inode/directory: ${terminal} -e ${directory} -
-        text/directory: ${terminal} -e ${directory}
-        application/x-directory: ${terminal} -e ${directory}
-        video/: ${media}
-        audio/: ${media}
-        # image/: feh
-      '';
-    };
+    # file.".config/mimi/mime.conf" = let
+    #   terminal = "${pkgs.alacritty}/bin/alacritty";
+    #   directory = "${superfile}/bin/superfile";
+    #   # text = "${pkgs.neovim}/bin/nvim"; # NOTE: this is not the same nvim as the one brought by home-manager
+    #   media = "${pkgs.vlc}/bin/vlc";
+    # in {
+    #   # text/: ${terminal} -e ${text}
+    #   text = ''
+    #     inode/directory: ${terminal} -e ${directory} -
+    #     text/directory: ${terminal} -e ${directory}
+    #     application/x-directory: ${terminal} -e ${directory}
+    #     video/: ${media}
+    #     audio/: ${media}
+    #     # image/: feh
+    #   '';
+    # };
   };
 
   services = {
     gpg-agent = {
-      enable = true;
+      enable = false;
 
       enableZshIntegration = true;
       pinentryPackage = pkgs-latest.pinentry-curses;
@@ -421,9 +418,11 @@ in {
       enable = true;
 
       settings = {
-        import = [
-          ui.terminal.theme.package
-        ];
+        general = {
+          import = [
+            ui.terminal.theme.package
+          ];
+        };
 
         # TODO: iterate map { normal = "Regular", ... }
         font = with font; {
@@ -480,7 +479,7 @@ in {
     };
 
     gpg = {
-      enable = true;
+      enable = false;
 
       homedir = "${paths.home}/.gpg";
 
@@ -619,9 +618,9 @@ in {
         confirmOnQuit = true;
         promptToReturnFromSubprocess = false;
 
-        git = {
-          overrideGpg = true;
-        };
+        # git = {
+        #   overrideGpg = true;
+        # };
 
         gui = {
           showPanelJump = false;
@@ -725,12 +724,12 @@ in {
 
         "${alacritty}/bin/alacritty --title \"MAIN_TERMINAL_1\" --command tmux attach &"
 
-        "${pkgs-latest.webcord}/bin/webcord &"
-        "${pkgs-latest.slack}/bin/slack &"
-        "${pkgs-latest.spotify}/bin/spotify &"
+        # "${pkgs-latest.webcord}/bin/webcord &"
+        # "${pkgs-latest.slack}/bin/slack &"
+        # "${pkgs-latest.spotify}/bin/spotify &"
       ];
 
-      monitor = with lib.head machine.devices.displays; "${output},${toString resolution.width}x${toString resolution.height}@${toString resolution.at},0x0,1";
+      # monitor = with lib.head machine.devices.displays; "${output},${toString resolution.width}x${toString resolution.height}@${toString resolution.at},0x0,1";
 
       general = {
         layout = "master";
@@ -745,7 +744,6 @@ in {
         gaps_out = 5;
         gaps_workspaces = 5;
 
-        no_cursor_warps = true;
         resize_on_border = true;
         no_focus_fallback = true;
       };
@@ -757,8 +755,6 @@ in {
 
       master = {
         orientation = "center";
-        always_center_master = true;
-        new_is_master = false;
         new_on_top = false;
       };
 
@@ -826,7 +822,7 @@ in {
         "${move},left,movewindow,l"
 
         "${resize},f,fullscreen,0"
-        "${resize},g,fakefullscreen"
+        # "${resize},g,fakefullscreen"
 
         "${prefix},f,togglefloating"
         "${prefix},t,pin"

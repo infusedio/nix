@@ -1,10 +1,11 @@
-input@{ lib, pkgs, dev, ... }:
-
-let
+input @ {
+  lib,
+  pkgs,
+  dev,
+  ...
+}: let
   config = input.config.os.hardware.kernel;
-
-in
-{
+in {
   options.os.hardware.kernel = {
     channel = lib.mkOption {
       type = lib.types.enum [
@@ -19,14 +20,14 @@ in
   config = {
     boot = {
       initrd = {
-        availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" ];
-        kernelModules = [ ];
+        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod"];
+        kernelModules = [];
       };
-      kernelModules = [ "kvm-amd" ];
-      extraModulePackages = [ ];
+      kernelModules = ["kvm-amd"];
+      extraModulePackages = [];
 
-      kernelPackages = lib.mkDefault
-        (with pkgs; (if config.channel == "latest" then linuxPackages_latest else linuxPackages));
+      # kernelPackages = lib.mkDefault
+      #   (with pkgs; (if config.channel == "latest" then linuxPackages_latest else linuxPackages));
 
       kernel = {
         sysctl."fs.inotify.max_user_watches" = 16777216;
