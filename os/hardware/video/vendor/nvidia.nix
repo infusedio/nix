@@ -1,4 +1,4 @@
-input @ {lib, ...}: {
+input @ {lib, pkgs, ...}: {
   # TODO: https://github.com/nomadics9/NixOS-Flake/blob/main/modules/nixos/nvidia.nix
   config = lib.mkIf (input.config.os.hardware.video.platform == "nvidia") {
     services.xserver.videoDrivers = ["nvidia"];
@@ -6,7 +6,8 @@ input @ {lib, ...}: {
     hardware.nvidia = {
       modesetting.enable = true;
       powerManagement.enable = false;
-      open = true;
+      nvidiaSettings = true;
+      open = false;
     };
   };
 }
