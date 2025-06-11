@@ -30,6 +30,7 @@ in
     nixpkgs = {
       config = {
         allowUnfree = lib.mkDefault true;
+        cudaSupport = lib.mkDefault true; # this will break amd platforms, just hotwiring it to test vllm, we can read video platform config ("amd" | "nvidia")
       };
     };
   };

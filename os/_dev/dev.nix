@@ -195,21 +195,21 @@ in {
   };
 
   services = {
-    gpg-agent = {
-      enable = false;
-
-      enableZshIntegration = true;
-      pinentryPackage = pkgs-latest.pinentry-curses;
-
-      defaultCacheTtl = 604800; # 1 week
-      maxCacheTtl = 604800; # 1 week
-
-      # TODO:
-      # enableSshSupport = true;
-      # defaltCacheTtlSsh = 86400; # 1 day
-      # maxCacheTtlSsh = 604800; # 1 week
-      # sshKeys = [ ];
-    };
+    # gpg-agent = {
+    #   enable = true;
+    #
+    #   enableZshIntegration = true;
+    #   pinentryPackage = pkgs-latest.pinentry-curses;
+    #
+    #   defaultCacheTtl = 604800; # 1 week
+    #   maxCacheTtl = 604800; # 1 week
+    #
+    #   # TODO:
+    #   # enableSshSupport = true;
+    #   # defaltCacheTtlSsh = 86400; # 1 day
+    #   # maxCacheTtlSsh = 604800; # 1 week
+    #   # sshKeys = [ ];
+    # };
 
     swayosd = {
       enable = true;
@@ -478,15 +478,15 @@ in {
       };
     };
 
-    gpg = {
-      enable = false;
-
-      homedir = "${paths.home}/.gpg";
-
-      # NOTE: make immutable when age or sops is introduced
-      mutableKeys = true;
-      mutableTrust = true;
-    };
+    # gpg = {
+    #   enable = false;
+    #
+    #   homedir = "${paths.home}/.gpg";
+    #
+    #   # NOTE: make immutable when age or sops is introduced
+    #   mutableKeys = true;
+    #   mutableTrust = true;
+    # };
 
     git = {
       enable = true;
